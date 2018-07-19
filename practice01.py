@@ -21,48 +21,64 @@ def driver(request):
 def test_example(driver):
 
     # Test user data such as name, last name etc...
-    name = "testNamea"
-    lastName = "testLastNamea"
-    email = "testEmaila@mail.com"
+    name = "testNameaaa"
+    lastName = "testLastNameaaa"
+    email = "testEmailaaa@mail.com"
     password = "123456"
-
+    city = "Tokyo"
+    address = "Baker street, 10"
+    tel = "+15551234567"
 
     # First step of registration, till confirmation letter is sent
-    driver.implicitly_wait(50)
+    driver.implicitly_wait(5)
     driver.get("http://www.app32.appdevstage.com/")
-    driver.implicitly_wait(50)
+    WebDriverWait(driver, 5).until(
+        EC.title_is("OctaFX ECN Forex broker – Online Forex Trading"))
     driver.find_element_by_xpath("//a[@href='http://my.app32.appdevstage.com/open-account']").click()
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//aside")))
     driver.find_element_by_xpath("//input[@name='firstName']").send_keys(name)
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//input[@name='lastName']")))
     driver.find_element_by_xpath("//input[@name='lastName']").send_keys(lastName)
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[1]/form/div[2]/div/input")))
     driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[2]/div/input").send_keys(email)
-    WebDriverWait(driver, 10).until(
+    WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input")))
     driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input").send_keys(password)
-    driver.save_screenshot('screenie.png')
-    driver.find_element_by_xpath("//button[@data-auto-event-label='Open account']").click()
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located(
-            (By.XPATH, "/html/body/aside/div/div[3]/div[2]/div[1]")))
+    try:
+        driver.find_element_by_xpath("//button[@data-auto-event-label='Open account']").click()
+        WebDriverWait(driver, 5).until(
+            EC.visibility_of_element_located(
+                (By.XPATH, "/html/body/aside/div/div[3]/div[2]/div[1]")))
+    except Exception:
+        driver.save_screenshot('screenshot1.png')
 
     # Second step of registration (confirmation of the letter)
     driver.implicitly_wait(50)
     driver.get("http://mailhog.app32.appdevstage.com/")
     driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(email)
+    WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located(
+            (By.XPATH, "//span[contains(text(), 'Confirm your email address to start trading')]")))
+    driver.save_screenshot('screenshot1.png')
     driver.find_element_by_xpath("//span[contains(text(), 'Confirm your email address to start trading')]").click()
     driver.switch_to_frame("preview-html")
-    driver.find_element_by_partial_link_text('Confirm').click()
+    try:
+        driver.find_element_by_partial_link_text('Confirm').click()
+        WebDriverWait(driver, 10).until(
+            EC.title_is(
+                ("Open new real account | OctaFX")))
+    except Exception:
+        driver.save_screenshot('screenshot2.png')
 
-    # Third step of registration (sign in after confirmation)
+    """
+    # Third step of registration (sign in after confirmation) (NOT NECCESSARY)
     driver.implicitly_wait(50)
     driver.get("http://www.app32.appdevstage.com/")
     driver.implicitly_wait(50)
@@ -77,6 +93,15 @@ def test_example(driver):
     driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
     driver.save_screenshot('screenie.png')
     driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
+    WebDriverWait(driver, 10).until(
+        EC.title_is(
+            ("Open new real account | OctaFX")))
+    """
+
+    # Forth step (registration itself)
+    driver.find_element_by_name("city").send_keys(city)
+    driver.find_element_by_name("address").send_keys(address)
+    driver.find_element_by_name("tel").send_keys(tel)
 
 
 
