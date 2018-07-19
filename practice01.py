@@ -26,6 +26,7 @@ def test_example(driver):
     email = "testEmaila@mail.com"
     password = "123456"
 
+
     # First step of registration, till confirmation letter is sent
     driver.implicitly_wait(50)
     driver.get("http://www.app32.appdevstage.com/")
@@ -60,5 +61,22 @@ def test_example(driver):
     driver.find_element_by_xpath("//span[contains(text(), 'Confirm your email address to start trading')]").click()
     driver.switch_to_frame("preview-html")
     driver.find_element_by_partial_link_text('Confirm').click()
+
+    # Third step of registration (sign in after confirmation)
+    driver.implicitly_wait(50)
+    driver.get("http://www.app32.appdevstage.com/")
+    driver.implicitly_wait(50)
+    driver.find_element_by_xpath("//span[contains(text(), 'Sign in')]").click()
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located(
+            (By.XPATH, "//aside")))
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[1]/div/input").send_keys(email)
+    WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located(
+            (By.XPATH, "/html/body/aside/div/div[2]/div/form/div[2]/div/input")))
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
+    driver.save_screenshot('screenie.png')
+    driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
+
 
 
