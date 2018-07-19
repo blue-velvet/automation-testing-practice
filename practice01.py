@@ -30,7 +30,8 @@ def test_example(driver):
     password = "123456"
     city = "Tokyo"
     address = "Baker street, 10"
-    tel = "+15551234567"
+    phone = "+15551234567"
+    """
 
 
     # First step of registration, till confirmation letter is sent
@@ -104,19 +105,37 @@ def test_example(driver):
                 ("Open new real account | OctaFX")))
     except Exception:
         driver.save_screenshot('screenshot3.png')
-    """
+
 
 
     # Forth step (registration itself)
-    driver.switch_to.window(driver.window_handles[1])
-    driver.find_element_by_xpath("//select[@name='country']/option[text()='Malaysia']")
+    # driver.switch_to.window(driver.window_handles[1])
+    driver.find_element_by_id("country_selector_chosen").click()
+    element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
+    element.send_keys('Malaysia')
+    element.send_keys(u'\ue007')
     driver.find_element_by_name("city").send_keys(city)
     driver.find_element_by_name("address").send_keys(address)
-    driver.find_element_by_name("tel").send_keys(tel)
-    driver.find_element_by_xpath("//select[@name='birthday-day']/option[text()='03']")
-    driver.find_element_by_xpath("//select[@name='birthday-month']/option[text()='April']")
-    driver.find_element_by_xpath("//select[@name='birthday-year']/option[text()='1985']")
-    driver.find_element_by_xpath("//form-t01__radio-input-elem[contains(text(), 'Yes')]")
+    driver.find_element_by_name("phone").send_keys(phone)
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/a/span").click()
+    element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/div/div/input")
+    element.send_keys('22')
+    element.send_keys(u'\ue007')
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[2]/a/span").click()
+    element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[2]/div/div/input")
+    element.send_keys('April')
+    element.send_keys(u'\ue007')
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[3]/a/span").click()
+    element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[3]/div/div/input")
+    element.send_keys('1985')
+    element.send_keys(u'\ue007')
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[6]/div[2]/div[1]/label/span").click()
+    driver.find_element_by_xpath("//button[@data-auto-event-label='Continue']").click()
+    WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located(
+            (By.XPATH, "//div[@class ='reg-dep-form-block js-wizard-step-select-platform']")))
+    driver.save_screenshot('screenshot4.png')
+
 
 
 
