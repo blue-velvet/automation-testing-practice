@@ -24,9 +24,9 @@ def driver(request):
 def test_example(driver):
 
     # Test user data such as name, last name etc...
-    name = "testNamecc"
-    lastName = "testLastNamecc"
-    email = "testEmailcc@mail.com"
+    name = "testNameccc"
+    lastName = "testLastNameccc"
+    email = "testEmailccc@mail.com"
     password = "123456"
     city = "Tokyo"
     address = "Baker street, 10"
@@ -87,6 +87,7 @@ def test_example(driver):
     """    
     # Third step of registration (sign in after confirmation) (NOT NECCESSARY)
     driver.get("http://www.app32.appdevstage.com/")
+    time.sleep(2)
     driver.find_element_by_xpath("//span[contains(text(), 'Sign in')]").click()
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
@@ -96,19 +97,26 @@ def test_example(driver):
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[2]/div/form/div[2]/div/input")))
     driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
-    driver.save_screenshot('screenie.png')
-    driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
-    WebDriverWait(driver, 10).until(
-        EC.title_is(
-            ("Open new real account | OctaFX")))
+    try:
+        driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
+        WebDriverWait(driver, 10).until(
+            EC.title_is(
+                ("Open new real account | OctaFX")))
+    except Exception:
+        driver.save_screenshot('screenshot3.png')
     """
 
 
     # Forth step (registration itself)
     driver.switch_to.window(driver.window_handles[1])
+    driver.find_element_by_xpath("//select[@name='country']/option[text()='Malaysia']")
     driver.find_element_by_name("city").send_keys(city)
     driver.find_element_by_name("address").send_keys(address)
     driver.find_element_by_name("tel").send_keys(tel)
+    driver.find_element_by_xpath("//select[@name='birthday-day']/option[text()='03']")
+    driver.find_element_by_xpath("//select[@name='birthday-month']/option[text()='April']")
+    driver.find_element_by_xpath("//select[@name='birthday-year']/option[text()='1985']")
+    driver.find_element_by_xpath("//form-t01__radio-input-elem[contains(text(), 'Yes')]")
 
 
 
