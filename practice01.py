@@ -24,9 +24,9 @@ def driver(request):
 def test_example(driver):
 
     # Test user data such as name, last name etc...
-    name = "testNamec"
-    lastName = "testLastNamec"
-    email = "testEmailc@mail.com"
+    name = "testNamecc"
+    lastName = "testLastNamecc"
+    email = "testEmailcc@mail.com"
     password = "123456"
     city = "Tokyo"
     address = "Baker street, 10"
@@ -105,7 +105,7 @@ def test_example(driver):
 
 
     # Forth step (registration itself)
-    driver.switch_to_window("Open new real account | OctaFX")
+    driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_name("city").send_keys(city)
     driver.find_element_by_name("address").send_keys(address)
     driver.find_element_by_name("tel").send_keys(tel)
