@@ -19,11 +19,14 @@ def driver(request):
 
 
 def test_example(driver):
+
+    # Test user data such as name, last name etc...
     name = "testNamea"
     lastName = "testLastNamea"
     email = "testEmaila@mail.com"
     password = "123456"
 
+    # First step of registration, till confirmation letter is sent
     driver.implicitly_wait(50)
     driver.get("http://www.app32.appdevstage.com/")
     driver.implicitly_wait(50)
@@ -50,13 +53,12 @@ def test_example(driver):
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[2]/div[1]")))
 
+    # Second step of registration (confirmation of the letter)
     driver.implicitly_wait(50)
     driver.get("http://mailhog.app32.appdevstage.com/")
-    driver.find_element_by_xpath("//input[@ng-model='searchText'").send_keys(email)
-    driver.find_element_by_class_name("subject unread ng-binding").click()
-    WebDriverWait(driver, 10).until(
-        EC.visibility_of_element_located(
-            (By.PARTIAL_LINK_TEXT, "http://my.app32.appdevstage.com/verification/email/")))
-    driver.find_element_by_partial_link_text("http://my.app32.appdevstage.com/verification/email/").click()
+    driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(email)
+    driver.find_element_by_xpath("//span[contains(text(), 'Confirm your email address to start trading')]").click()
+    driver.switch_to_frame("preview-html")
+    driver.find_element_by_partial_link_text('Confirm').click()
 
 
