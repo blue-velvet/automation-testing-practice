@@ -3,6 +3,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 
 
@@ -24,9 +25,9 @@ def driver(request):
 def test_example(driver):
 
     # Test user data such as name, last name etc...
-    name = "testNameccc"
-    lastName = "testLastNameccc"
-    email = "testEmailccc@mail.com"
+    name = "testName"
+    lastName = "testLastName"
+    email = "testEmail@mail.com"
     password = "123456"
     city = "Tokyo"
     address = "Baker street, 10"
@@ -85,7 +86,7 @@ def test_example(driver):
         driver.save_screenshot('screenshot2.png')
 
 
-    """    
+    """
     # Third step of registration (sign in after confirmation) (NOT NECCESSARY)
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
@@ -98,6 +99,7 @@ def test_example(driver):
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[2]/div/form/div[2]/div/input")))
     driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
+    time.sleep(0.2)
     try:
         driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
         WebDriverWait(driver, 10).until(
@@ -107,16 +109,21 @@ def test_example(driver):
         driver.save_screenshot('screenshot3.png')
 
 
-
     # Forth step (registration itself)
+    # Address window
     # driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_id("country_selector_chosen").click()
     element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
     element.send_keys('Malaysia')
     element.send_keys(u'\ue007')
-    driver.find_element_by_name("city").send_keys(city)
-    driver.find_element_by_name("address").send_keys(address)
-    driver.find_element_by_name("phone").send_keys(phone)
+    element = driver.find_element_by_name("city")
+    if element.get_attribute("value") == None:
+        element.send_keys(city)
+    element = driver.find_element_by_name("address")
+    if element.get_attribute("value") == None:
+        element.send_keys(address)
+    if element.get_attribute("value") == None:
+        element.send_keys(phone)
     driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/a/span").click()
     element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/div/div/input")
     element.send_keys('22')
@@ -135,6 +142,15 @@ def test_example(driver):
         EC.visibility_of_element_located(
             (By.XPATH, "//div[@class ='reg-dep-form-block js-wizard-step-select-platform']")))
     driver.save_screenshot('screenshot4.png')
+
+
+    # Platform window
+    time.sleep(0.2)
+    driver.find_element_by_xpath("//input[@value='mt5']").send_keys(u'\ue00d')
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/a").send_keys(u'\ue00d')
+    driver.find_element_by_xpath("/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").clicl()
+    driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to deposit'][2]").click()
+
 
 
 
