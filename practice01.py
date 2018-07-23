@@ -43,10 +43,9 @@ def test_example(driver):
     #address = "Baker street, 10"
     #phone = "+15551234567"
 
-    new_user_registration(driver, email, lastName, name, password)
-    confirm_letter(driver, email)
+    #new_user_registration(driver, email, lastName, name, password)
+    #confirm_letter(driver, email)
     sign_in_after_confirmation(driver, email, password)
-    # Address window
     fill_address(address, city, driver, phone)
     choose_platform(driver)
 
@@ -125,18 +124,19 @@ def sign_in_after_confirmation(driver, email, password):
 
 
 def fill_address(address, city, driver, phone):
-    driver.switch_to.window(driver.window_handles[1])
+    #driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_id("country_selector_chosen").click()
     element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
     element.send_keys('Malaysia')
     element.send_keys(u'\ue007')
     element = driver.find_element_by_name("city")
-    if element.get_attribute("value") == None:
+    if element.get_attribute("value") == "":
         element.send_keys(city)
     element = driver.find_element_by_name("address")
-    if element.get_attribute("value") == None:
+    if element.get_attribute("value") == "":
         element.send_keys(address)
-    if element.get_attribute("value") == None:
+    element = driver.find_element_by_name("phone")
+    if element.get_attribute("value") == "":
         element.send_keys(phone)
     driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/a/span").click()
     element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/div/div/input")
