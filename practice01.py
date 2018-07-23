@@ -1,6 +1,6 @@
 import pytest
 import time
-from group import Group
+from group import RegGroup, AddressGroup
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
@@ -38,10 +38,10 @@ def test_example(driver):
     phone = line[6]
     f.close()
 
-    new_user_registration(driver, Group(email, lastName, name, password))
-    #confirm_letter(driver, Group(email))
-    sign_in_after_confirmation(driver, Group(email, password))
-    fill_address(driver, Group(address, city, driver, phone))
+    new_user_registration(driver, RegGroup(name, lastName, email, password))
+    confirm_letter(driver, email)
+    #sign_in_after_confirmation(driver, Group(email, password))
+    fill_address(driver, AddressGroup(address, city, phone))
     choose_platform(driver)
 
 
@@ -65,6 +65,7 @@ def new_user_registration(driver, group):
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input")))
     driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input").send_keys(group.password)
+    time.sleep(0.5)
     try:
         driver.find_element_by_xpath("//button[@data-auto-event-label='Open account']").click()
         WebDriverWait(driver, 5).until(
@@ -72,13 +73,13 @@ def new_user_registration(driver, group):
                 (By.XPATH, "/html/body/aside/div/div[3]/div[2]/div[1]")))
     except Exception:
         driver.save_screenshot('screenshot1.png')
-    time.sleep(10)
+    time.sleep(7)
 
 
-def confirm_letter(driver, group):
+def confirm_letter(driver, email):
     driver.get("http://mailhog.app32.appdevstage.com/")
     time.sleep(1)
-    driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(group.email)
+    driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(email)
     driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(u'\ue007')
     time.sleep(1)
     WebDriverWait(driver, 5).until(
@@ -96,18 +97,18 @@ def confirm_letter(driver, group):
         driver.save_screenshot('screenshot2.png')
 
 
-def sign_in_after_confirmation(driver, group):
+def sign_in_after_confirmation(driver, email, password):
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
     driver.find_element_by_xpath("//span[contains(text(), 'Sign in')]").click()
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//aside")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[1]/div/input").send_keys(group.email)
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[1]/div/input").send_keys(email)
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[2]/div/form/div[2]/div/input")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(group.password)
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
     time.sleep(0.2)
     try:
         driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
@@ -119,7 +120,7 @@ def sign_in_after_confirmation(driver, group):
 
 
 def fill_address(driver, group):
-    #driver.switch_to.window(driver.window_handles[1])
+    driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_id("country_selector_chosen").click()
     element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
     element.send_keys('Malaysia')
@@ -157,12 +158,12 @@ def choose_platform(driver):
     time.sleep(0.2)
     driver.find_element_by_xpath("//input[@value='mt5']").send_keys(u'\ue00d')
     time.sleep(0.2)
-    ActionChains(driver).move_to_element(
-        "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div").send_keys(u'\ue00d').send_keys(u'\ue007')
+    #ActionChains(driver).move_to_element(
+    #    "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div").send_keys(u'\ue00d').send_keys(u'\ue007')
     #ActionChains(driver).move_to_element(
     #    "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").click()
-    time.sleep(3)
-    #driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to practice']").click()
+    #time.sleep(3)
+    driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to practice']").click()
 
 
 
