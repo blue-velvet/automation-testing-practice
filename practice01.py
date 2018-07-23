@@ -1,10 +1,13 @@
 import pytest
 import time
+from group import Group
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException, ElementNotVisibleException
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.touch_actions import TouchActions
 
 
 @pytest.fixture
@@ -35,41 +38,33 @@ def test_example(driver):
     phone = line[6]
     f.close()
 
-    #name = "testName"
-    #lastName = "testLastName"
-    #email = "testEmail@mail.com"
-    #password = "123456"
-    #city = "Tokyo"
-    #address = "Baker street, 10"
-    #phone = "+15551234567"
-
-    #new_user_registration(driver, email, lastName, name, password)
-    #confirm_letter(driver, email)
-    sign_in_after_confirmation(driver, email, password)
-    fill_address(address, city, driver, phone)
+    new_user_registration(driver, Group(email, lastName, name, password))
+    #confirm_letter(driver, Group(email))
+    sign_in_after_confirmation(driver, Group(email, password))
+    fill_address(driver, Group(address, city, driver, phone))
     choose_platform(driver)
 
 
-def new_user_registration(driver, email, lastName, name, password):
+def new_user_registration(driver, group):
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
     driver.find_element_by_xpath("//a[@href='http://my.app32.appdevstage.com/open-account']").click()
     WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//aside")))
-    driver.find_element_by_xpath("//input[@name='firstName']").send_keys(name)
+    driver.find_element_by_xpath("//input[@name='firstName']").send_keys(group.name)
     WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//input[@name='lastName']")))
-    driver.find_element_by_xpath("//input[@name='lastName']").send_keys(lastName)
+    driver.find_element_by_xpath("//input[@name='lastName']").send_keys(group.lastName)
     WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[1]/form/div[2]/div/input")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[2]/div/input").send_keys(email)
+    driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[2]/div/input").send_keys(group.email)
     WebDriverWait(driver, 5).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input").send_keys(password)
+    driver.find_element_by_xpath("/html/body/aside/div/div[3]/div[1]/form/div[3]/div/input").send_keys(group.password)
     try:
         driver.find_element_by_xpath("//button[@data-auto-event-label='Open account']").click()
         WebDriverWait(driver, 5).until(
@@ -80,10 +75,10 @@ def new_user_registration(driver, email, lastName, name, password):
     time.sleep(10)
 
 
-def confirm_letter(driver, email):
+def confirm_letter(driver, group):
     driver.get("http://mailhog.app32.appdevstage.com/")
     time.sleep(1)
-    driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(email)
+    driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(group.email)
     driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(u'\ue007')
     time.sleep(1)
     WebDriverWait(driver, 5).until(
@@ -101,18 +96,18 @@ def confirm_letter(driver, email):
         driver.save_screenshot('screenshot2.png')
 
 
-def sign_in_after_confirmation(driver, email, password):
+def sign_in_after_confirmation(driver, group):
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
     driver.find_element_by_xpath("//span[contains(text(), 'Sign in')]").click()
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
             (By.XPATH, "//aside")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[1]/div/input").send_keys(email)
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[1]/div/input").send_keys(group.email)
     WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located(
             (By.XPATH, "/html/body/aside/div/div[2]/div/form/div[2]/div/input")))
-    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(password)
+    driver.find_element_by_xpath("/html/body/aside/div/div[2]/div/form/div[2]/div/input").send_keys(group.password)
     time.sleep(0.2)
     try:
         driver.find_element_by_xpath("//button[@data-auto-event-label='Sign In']").click()
@@ -123,7 +118,7 @@ def sign_in_after_confirmation(driver, email, password):
         driver.save_screenshot('screenshot3.png')
 
 
-def fill_address(address, city, driver, phone):
+def fill_address(driver, group):
     #driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_id("country_selector_chosen").click()
     element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
@@ -131,13 +126,13 @@ def fill_address(address, city, driver, phone):
     element.send_keys(u'\ue007')
     element = driver.find_element_by_name("city")
     if element.get_attribute("value") == "":
-        element.send_keys(city)
+        element.send_keys(group.city)
     element = driver.find_element_by_name("address")
     if element.get_attribute("value") == "":
-        element.send_keys(address)
+        element.send_keys(group.address)
     element = driver.find_element_by_name("phone")
     if element.get_attribute("value") == "":
-        element.send_keys(phone)
+        element.send_keys(group.phone)
     driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/a/span").click()
     element = driver.find_element_by_xpath("/html/body/div[3]/main/div[1]/form/div[5]/div/div/div[1]/div/div/input")
     element.send_keys('22')
@@ -162,19 +157,14 @@ def choose_platform(driver):
     time.sleep(0.2)
     driver.find_element_by_xpath("//input[@value='mt5']").send_keys(u'\ue00d')
     time.sleep(0.2)
-    try:
-        driver.find_element_by_xpath(
-            "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div").click()
-    except ElementClickInterceptedException or ElementNotVisibleException:
-        driver.save_screenshot('screenshot5.png')
-    try:
-        driver.find_element_by_xpath(
-            "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div").click()
-    except ElementClickInterceptedException or ElementNotVisibleException:
-        driver.save_screenshot('screenshot6.png')
-    driver.find_element_by_xpath(
-        "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").click()
-    driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to deposit'][2]").click()
+    ActionChains(driver).move_to_element(
+        "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div").send_keys(u'\ue00d').send_keys(u'\ue007')
+    #ActionChains(driver).move_to_element(
+    #    "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").click()
+    time.sleep(3)
+    #driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to practice']").click()
+
+
 
 
 
