@@ -3,9 +3,8 @@ import time
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
-
+from selenium.common.exceptions import ElementClickInterceptedException, ElementNotVisibleException
 
 
 @pytest.fixture
@@ -25,17 +24,34 @@ def driver(request):
 def test_example(driver):
 
     # Test user data such as name, last name etc...
-    name = "testName"
-    lastName = "testLastName"
-    email = "testEmail@mail.com"
-    password = "123456"
-    city = "Tokyo"
-    address = "Baker street, 10"
-    phone = "+15551234567"
-    """
+    f = open("C:\\Users\\kchumakov.000\\Documents\\GitHub\\automation-testing-practice\\test_data.txt")
+    line = f.readlines()
+    name = line[0]
+    lastName = line[1]
+    email = line[2]
+    password = line[3]
+    city = line[4]
+    address = line[5]
+    phone = line[6]
+    f.close()
+
+    #name = "testName"
+    #lastName = "testLastName"
+    #email = "testEmail@mail.com"
+    #password = "123456"
+    #city = "Tokyo"
+    #address = "Baker street, 10"
+    #phone = "+15551234567"
+
+    new_user_registration(driver, email, lastName, name, password)
+    confirm_letter(driver, email)
+    sign_in_after_confirmation(driver, email, password)
+    # Address window
+    fill_address(address, city, driver, phone)
+    choose_platform(driver)
 
 
-    # First step of registration, till confirmation letter is sent
+def new_user_registration(driver, email, lastName, name, password):
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
     driver.find_element_by_xpath("//a[@href='http://my.app32.appdevstage.com/open-account']").click()
@@ -65,7 +81,7 @@ def test_example(driver):
     time.sleep(10)
 
 
-    # Second step of registration (confirmation of the letter)
+def confirm_letter(driver, email):
     driver.get("http://mailhog.app32.appdevstage.com/")
     time.sleep(1)
     driver.find_element_by_xpath("//input[@ng-model='searchText']").send_keys(email)
@@ -86,8 +102,7 @@ def test_example(driver):
         driver.save_screenshot('screenshot2.png')
 
 
-    """
-    # Third step of registration (sign in after confirmation) (NOT NECCESSARY)
+def sign_in_after_confirmation(driver, email, password):
     driver.get("http://www.app32.appdevstage.com/")
     time.sleep(2)
     driver.find_element_by_xpath("//span[contains(text(), 'Sign in')]").click()
@@ -109,9 +124,8 @@ def test_example(driver):
         driver.save_screenshot('screenshot3.png')
 
 
-    # Forth step (registration itself)
-    # Address window
-    # driver.switch_to.window(driver.window_handles[1])
+def fill_address(address, city, driver, phone):
+    driver.switch_to.window(driver.window_handles[1])
     driver.find_element_by_id("country_selector_chosen").click()
     element = driver.find_element_by_xpath("//input[@class='chosen-search-input']")
     element.send_keys('Malaysia')
@@ -144,11 +158,22 @@ def test_example(driver):
     driver.save_screenshot('screenshot4.png')
 
 
-    # Platform window
+def choose_platform(driver):
     time.sleep(0.2)
     driver.find_element_by_xpath("//input[@value='mt5']").send_keys(u'\ue00d')
-    driver.find_element_by_xpath("/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/a").send_keys(u'\ue00d')
-    driver.find_element_by_xpath("/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").clicl()
+    time.sleep(0.2)
+    try:
+        driver.find_element_by_xpath(
+            "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div").click()
+    except ElementClickInterceptedException or ElementNotVisibleException:
+        driver.save_screenshot('screenshot5.png')
+    try:
+        driver.find_element_by_xpath(
+            "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div").click()
+    except ElementClickInterceptedException or ElementNotVisibleException:
+        driver.save_screenshot('screenshot6.png')
+    driver.find_element_by_xpath(
+        "/html/body/div[3]/main/div[2]/div/form/div[1]/ul/li[1]/div[2]/div[2]/div/div/div/ul/li[2]").click()
     driver.find_element_by_xpath("//button[@data-auto-event-label='Continue to deposit'][2]").click()
 
 
